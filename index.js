@@ -6,7 +6,6 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 client.once(Events.ClientReady, (readyClient) => {
   console.log(`Ready! Logged in as ${readyClient.user.tag}`);
-  readyClient.user.setPresence({ activities: null });
   let latestPrice = 0;
   let errorCount = 0;
   setInterval(() => {
@@ -19,7 +18,9 @@ client.once(Events.ClientReady, (readyClient) => {
           throw new Error(data.msg);
         }
         const parsedPrice = parseFloat(data.price).toFixed(2);
-        readyClient.user.setUsername(`₺${parsedPrice}`);
+        readyClient.guilds.cache.forEach((guild) => {
+          guild.members.me.setNickname(`${parsedPrice} TRY`);
+        });
         latestPrice = parsedPrice;
       })
       .catch((err) => {
@@ -28,11 +29,11 @@ client.once(Events.ClientReady, (readyClient) => {
           console.error("Too many errors. Exiting...", err);
           process.exit(1);
         }
-        readyClient.user.setUsername(`USDT/TRY: ${latestPrice} TRY`, {
-          type: 3,
+        readyClient.guilds.cache.forEach((guild) => {
+          guild.members.me.setNickname(`${parsedPrice} TRY`);
         });
       });
-  }, 15_000);
+  }, 10_000);
 });
 
 client.login(token);
