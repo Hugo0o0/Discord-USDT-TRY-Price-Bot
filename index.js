@@ -17,9 +17,9 @@ client.once(Events.ClientReady, (readyClient) => {
           errorCount++;
           throw new Error(data.msg);
         }
-        readyClient.guilds.cache.forEach((guild) => {
-          const parsedPrice = parseFloat(data.price).toFixed(2);
-          guild.members.me.setNickname(`${parsedPrice} TRY`);
+        const parsedPrice = parseFloat(data.price).toFixed(2);
+        readyClient.guilds.cache.forEach(async (guild) => {
+          await guild.members.me.setNickname(`${parsedPrice} TRY`);
         });
         latestPrice = parsedPrice;
       })
@@ -29,8 +29,8 @@ client.once(Events.ClientReady, (readyClient) => {
           console.error("Too many errors. Exiting...", err);
           process.exit(1);
         }
-        readyClient.guilds.cache.forEach((guild) => {
-          guild.members.me.setNickname(`${latestPrice} TRY`);
+        readyClient.guilds.cache.forEach(async (guild) => {
+          await guild.members.me.setNickname(`${latestPrice} TRY`);
         });
       });
   }, 10_000);
