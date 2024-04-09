@@ -17,8 +17,8 @@ client.once(Events.ClientReady, (readyClient) => {
           errorCount++;
           throw new Error(data.msg);
         }
-        const parsedPrice = parseFloat(data.price).toFixed(2);
         readyClient.guilds.cache.forEach((guild) => {
+          const parsedPrice = parseFloat(data.price).toFixed(2);
           guild.members.me.setNickname(`${parsedPrice} TRY`);
         });
         latestPrice = parsedPrice;
