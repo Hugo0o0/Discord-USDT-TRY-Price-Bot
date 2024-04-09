@@ -30,7 +30,7 @@ client.once(Events.ClientReady, (readyClient) => {
           process.exit(1);
         }
         readyClient.guilds.cache.forEach((guild) => {
-          guild.members.me.setNickname(`${parsedPrice} TRY`);
+          guild.members.me.setNickname(`${latestPrice} TRY`);
         });
       });
   }, 10_000);
