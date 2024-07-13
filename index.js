@@ -1,44 +1,46 @@
 const { Client, Events, GatewayIntentBits } = require("discord.js");
 const getPrice = require("./utils/get-price");
+const logger = require("./utils/Logger");
 const token = require("./config.json").token;
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
-client.once(Events.ClientReady, (readyClient) => {
-  console.log(`Ready! Logged in as ${readyClient.user.tag}`);
-  let latestPrice = 0;
-  let errorCount = 0;
-  setInterval(() => {
-    try {
-      console.log(`Fetching new price...`);
-      console.log(`Latest price was ${latestPrice} TRY.`);
-      getPrice()
-        .then((data) => {
-          if (data.msg) {
-            errorCount++;
-            throw new Error(data.msg);
-          }
-          const parsedPrice = parseFloat(data.price).toFixed(2);
-          readyClient.guilds.cache.forEach(async (guild) => {
-            await guild.members.me.setNickname(`${parsedPrice} TRY`);
-          });
-          latestPrice = parsedPrice;
-        })
-        .catch((err) => {
-          console.error(err);
-          if (errorCount === 10) {
-            console.error("Too many errors. Exiting...", err);
-            process.exit(1);
-          }
-          readyClient.guilds.cache.forEach(async (guild) => {
-            await guild.members.me.setNickname(`${latestPrice} TRY`);
-          });
-        });
-    } catch (error) {
-      console.log("Interval Function error", error.message);
-      console.log(error);
-    }
+const logFetchingNewPriceInfo = (latestPrice) => {
+  logger.info(`Fetching new price...`);
+  if (latestPrice) {
+    logger.info(`Latest price: ${latestPrice} TRY`);
+  }
+};
+
+const logStartInfo = (client) => {
+  logger.info(`Ready! Logged in as ${client.user.tag}`);
+  logger.info("Fetching price will start in 10 seconds...");
+};
+
+const setNickname = async (client, nickname) => {
+  client.guilds.cache.forEach(async (guild) => {
+    await guild.members.me.setNickname(nickname);
+  });
+};
+
+const setNewNicknameEveryTenSeconds = async (latestPrice, client) => {
+  setInterval(async () => {
+    logFetchingNewPriceInfo(latestPrice);
+    const data = await getPrice();
+    console.log(data);
+    latestPrice = parseFloat(data.price).toFixed(2);
+    await setNickname(client, `${latestPrice} TRY`);
   }, 10_000);
+};
+
+client.once(Events.ClientReady, async (readyClient) => {
+  logStartInfo(readyClient);
+  let latestPrice = 0;
+  try {
+    await setNewNicknameEveryTenSeconds(latestPrice, readyClient);
+  } catch (error) {
+    logger.error(error);
+  }
 });
 
 client.login(token);
