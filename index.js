@@ -23,8 +23,8 @@ const setNickname = async (client, nickname) => {
   });
 };
 
-const setNewNicknameEveryTenSeconds = async (latestPrice, client) => {
-  setInterval(async () => {
+const setNewNicknameEveryTenSeconds = (latestPrice, client) => {
+  return setInterval(async () => {
     logFetchingNewPriceInfo(latestPrice);
     const data = await getPrice();
     console.log(data);
@@ -33,11 +33,12 @@ const setNewNicknameEveryTenSeconds = async (latestPrice, client) => {
   }, 10_000);
 };
 
-client.once(Events.ClientReady, async (readyClient) => {
+client.once(Events.ClientReady, (readyClient) => {
   logStartInfo(readyClient);
   let latestPrice = 0;
+  let intervalFunction;
   try {
-    await setNewNicknameEveryTenSeconds(latestPrice, readyClient);
+    intervalFunction = setNewNicknameEveryTenSeconds(latestPrice, readyClient);
   } catch (error) {
     logger.error(error);
   }
