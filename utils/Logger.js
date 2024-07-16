@@ -14,7 +14,7 @@ class Logger {
   }
 
   info(...args) {
-    this.log(chalk.blue(...args));
+    this.log(chalk.blueBright(...args));
   }
 
   debug(...args) {

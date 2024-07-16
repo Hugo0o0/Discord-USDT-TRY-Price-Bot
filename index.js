@@ -2,13 +2,13 @@ const { Client, Events, GatewayIntentBits } = require("discord.js");
 const getPrice = require("./utils/get-price");
 const logger = require("./utils/Logger");
 const token = require("./config.json").token;
+const startCLICountdown = require("./utils/start-cli-countdown");
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 const logFetchingNewPriceInfo = (latestPrice) => {
-  logger.info(`Fetching new price...`);
   if (latestPrice) {
-    logger.info(`Latest price: ${latestPrice} TRY`);
+    logger.info(`\nLast price: ${latestPrice} TRY`);
   }
 };
 
@@ -25,6 +25,7 @@ const setNickname = async (client, nickname) => {
 
 const setNewNicknameEveryThirtySeconds = (latestPrice, client) => {
   setInterval(async () => {
+    startCLICountdown(30);
     logFetchingNewPriceInfo(latestPrice);
     const data = await getPrice();
     latestPrice = parseFloat(data.price).toFixed(2);
@@ -34,6 +35,7 @@ const setNewNicknameEveryThirtySeconds = (latestPrice, client) => {
 
 client.once(Events.ClientReady, (readyClient) => {
   logStartInfo(readyClient);
+  startCLICountdown(30);
   let latestPrice = 0;
   try {
     setNewNicknameEveryThirtySeconds(latestPrice, readyClient);
