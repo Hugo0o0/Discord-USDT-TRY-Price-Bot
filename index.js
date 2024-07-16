@@ -14,7 +14,7 @@ const logFetchingNewPriceInfo = (latestPrice) => {
 
 const logStartInfo = (client) => {
   logger.info(`Ready! Logged in as ${client.user.tag}`);
-  logger.info("Fetching price will start in 10 seconds...");
+  logger.info("Fetching price will start in 30 seconds...");
 };
 
 const setNickname = async (client, nickname) => {
@@ -24,21 +24,19 @@ const setNickname = async (client, nickname) => {
 };
 
 const setNewNicknameEveryTenSeconds = (latestPrice, client) => {
-  return setInterval(async () => {
+  setInterval(async () => {
     logFetchingNewPriceInfo(latestPrice);
     const data = await getPrice();
-    console.log(data);
     latestPrice = parseFloat(data.price).toFixed(2);
     await setNickname(client, `${latestPrice} TRY`);
-  }, 10_000);
+  }, 30_000);
 };
 
 client.once(Events.ClientReady, (readyClient) => {
   logStartInfo(readyClient);
   let latestPrice = 0;
-  let intervalFunction;
   try {
-    intervalFunction = setNewNicknameEveryTenSeconds(latestPrice, readyClient);
+    setNewNicknameEveryTenSeconds(latestPrice, readyClient);
   } catch (error) {
     logger.error(error);
   }
