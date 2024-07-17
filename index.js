@@ -18,9 +18,13 @@ const logStartInfo = (client) => {
 };
 
 const setNickname = async (client, nickname) => {
-  client.guilds.cache.forEach(async (guild) => {
-    await guild.members.me.setNickname(nickname);
-  });
+  try {
+    client.guilds.cache.forEach(async (guild) => {
+      await guild.members.me.setNickname(nickname);
+    });
+  } catch (error) {
+    logger.error("Error while setting nickname: ", error);
+  }
 };
 
 const setNewNicknameEveryThirtySeconds = (latestPrice, client) => {
