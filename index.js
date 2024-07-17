@@ -25,11 +25,15 @@ const setNickname = async (client, nickname) => {
 
 const setNewNicknameEveryThirtySeconds = (latestPrice, client) => {
   setInterval(async () => {
-    startCLICountdown(30);
-    logFetchingNewPriceInfo(latestPrice);
-    const data = await getPrice();
-    latestPrice = parseFloat(data.price).toFixed(2);
-    await setNickname(client, `${latestPrice} TRY`);
+    try {
+      startCLICountdown(30);
+      logFetchingNewPriceInfo(latestPrice);
+      const data = await getPrice();
+      latestPrice = parseFloat(data.price).toFixed(2);
+      await setNickname(client, `${latestPrice} TRY`);
+    } catch (error) {
+      logger.error(error);
+    }
   }, 30_000);
 };
 
